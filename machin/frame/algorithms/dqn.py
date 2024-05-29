@@ -3,7 +3,7 @@ from copy import deepcopy
 import torch as t
 import torch.nn as nn
 import numpy as np
-
+from simhash import Simhash, SimhashIndex
 from machin.frame.buffers.buffer import Buffer
 from machin.frame.transition import Transition
 from machin.model.nets.base import NeuralNetworkModule
