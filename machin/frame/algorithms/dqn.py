@@ -289,6 +289,37 @@ edu/class/psych209/Readings/MnihEtAlHassibis15NatureControlDeepRL.pdf>`__ essay.
             return result
         else:
             return (result, *others)
+        
+    def act_discrete_with_noise_count_based_exploration(
+        self,
+        observation,
+        hash_index,
+        state: Dict[str, Any],
+        use_target: bool = False,
+        decay_epsilon: bool = True,
+        **__,
+    ):
+        """
+        """
+        if use_target:
+            result, *others = safe_call(self.qnet_target, state)
+        else:
+            result, *others = safe_call(self.qnet, state)
+
+        action_dim = result.shape[1]
+        result = t.argmax(result, dim=1).view(-1, 1)
+        dups = hash_index.get_near_dups(Simhash(str(observation)))
+        if dups < 600:
+            if t.rand([1]).item() < self.epsilon:
+                result = t.randint(0, action_dim, [result.shape[0], 1])
+
+        if decay_epsilon:
+            self.epsilon *= self.epsilon_decay
+
+        if len(others) == 0:
+            return result
+        else:
+            return (result, *others)
 
     def _act_discrete(self, state: Dict[str, Any], use_target: bool = False, **__):
         """
